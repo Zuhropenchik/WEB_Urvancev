@@ -1,0 +1,31 @@
+{% extends "inc/base.html" %}
+{% load static %}
+{% block content %}
+    <h2 class="mt-5">Ask question</h2>
+    <form>
+        <div class="mb-3">
+            <div class="input">
+                <label for="exampleInputEmail1" class="question-title">Question title</label>
+                <input type="email" class="form-control" id="Question title" aria-describedby="emailHelp">
+            </div>
+        </div>
+        <div class="mb-2">
+            <div class="inputq">
+                <label for="question1" class="form-label">Question</label>
+                <textarea class="form-control" id="QuestionText"></textarea>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="input">
+                <label for="exampleInputEmail1" class="question-title">Tags</label>
+                <input type="email" class="form-control" id="Question title" aria-describedby="emailHelp">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+{% endblock %}
+{% block side_panel %}
+    <div class="col-3">
+        <h2 class="mt-5">Tags</h2>
+    </div>
+{% endblock side_panel %}

@@ -1,0 +1,12 @@
+{% extends "inc/base.html" %}
+{% load static %}
+{% block content %}
+    <h2 class="mt-5">Questions</h2>
+    {% for question in questions %}
+        {% include 'inc/question.html' %}
+    {% endfor %}
+{% endblock %}
+{% block side_panel %}
+    {% include 'inc/tags.html' %}
+{% endblock side_panel %}
+
