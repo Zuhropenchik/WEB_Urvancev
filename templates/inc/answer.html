@@ -1,0 +1,36 @@
+{% load static %}
+<div class="row answer">
+    <div class="col-2">
+        <img class="avatar-answer" src="{% static 'img/Capibers.jpg' %}" alt="">
+    </div>
+    <div class="col-10">
+        <strong>{{ answer.get_author }}</strong>
+        <p>{{ answer.content }}</p>
+    </div>
+    {% if answer.is_correct %}
+        <div class="col-10" style="color: #00ff00">Correct answer</div>
+    {% endif %}
+    <div class="col-md-6 d-flex justify-content-left" style="padding-top: 10px">
+        <div>
+            <button style="background-color: #fff; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(27, 31, 35, 0.15);">
+                Correct!
+            </button>
+        </div>
+        <div>
+            <button style="background-color: #fff; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(27, 31, 35, 0.15);">
+                I like it!
+            </button>
+        </div>
+        <div>
+            {% if answer.likes > 0 %}
+                <div style="color: #00ff00">Rating:{{ answer.likes }}</div>
+            {% elif answer.likes == 0 %}
+                <div style="color: #eeee00">Rating:{{ answer.likes }}</div>
+            {% else %}
+                <div style="color: #ff0000">Rating:{{ answer.likes }}</div>
+            {% endif %}
+        </div>
+
+
+    </div>
+</div>

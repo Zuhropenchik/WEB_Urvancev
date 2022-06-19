@@ -1,9 +1,7 @@
+
 {% load static %}
 <div class="col-3">
-    <h2 class="mt-5">Tags</h2>
     <div class="mt-5">
-    {% for tag in tags %}
-        <h3>{{ tag.name }}</h3>
-    {% endfor %}
+        <h3><a href="{% url 'question_tag' tag.title %}">{{ tag.title }}</a></h3>
     </div>
 </div>

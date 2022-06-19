@@ -2,11 +2,10 @@
 {% load static %}
 {% block content %}
     <h2 class="mt-5">Question</h2>
-        {% include 'inc/question.html' %}
+    {% include 'inc/question.html' %}
+    {% for answer in answers %}
+        {% include 'inc/answer.html' %}
+    {% endfor %}
 {% endblock %}
-{% block side_panel %}
-    <div class="col-3">
-        <h2 class="mt-5">Tags</h2>
-    </div>
-{% endblock side_panel %}
+
 

@@ -1,35 +1,77 @@
 from django.shortcuts import render
-QUESTIONS = [
-    {
-        "title": f"Title #{i}",
-        "text": f"This is text for question #{i}",
-        "number": i,
-        "likes": i
-    } for i in range(10)
-]
+from django.core.paginator import Paginator
+from django.core.paginator import Paginator
+from .models import Question, Tag, User, Answer, Like
+from django.db.models import Count
+
 TAGS = [
     {
-        "name": f"Tag#{i}",
-        "number": i
-    } for i in range(10)
+        "title": f"tag#{i}",
+        "number": i,
+    } for i in range(20)
 ]
+PAGINATION_SIZE = 10
+
+
+def pagination(list_obj, request):
+    paginator = Paginator(list_obj, PAGINATION_SIZE)
+    page = request.GET.get('page')
+    content = paginator.get_page(page)
+
+    return content
+
+
 def index(request):
-    return render(request, "index.html", {"questions": QUESTIONS})
+    content = pagination(Question.objects.all().values(), request)
+    tags = Tag.objects.all().values()
+    return render(request, "index.html", {"questions": content, "tags": tags})
+
 
 def ask(request):
-    return render(request, "ask.html")
+    tags = Tag.objects.all().values()
+    return render(request, "ask.html", {"tags": tags})
+
 
 def auth(request):
-    return render(request, "auth.html")
+    tags = Tag.objects.all().values()
+    return render(request, "auth.html", {"tags": tags})
+
 
 def reg(request):
-    return render(request, "reg.html")
+    tags = Tag.objects.all().values()
+    return render(request, "reg.html", {"tags": tags})
+
 
 def hot(request):
-    return render(request, "hot.html", {"questions": QUESTIONS})
+    content = pagination(Question.objects.get_popular(), request)
+    content = sorted(content, key=lambda question: question.likes, reverse=True)
+    tags = Tag.objects.all().values()
+    return render(request, "index.html", {"questions": content, "tags": tags})
 
-def question(request, i:int):
-    return render(request, "question_page.html", {"question": QUESTIONS[i]})
 
-def tags(request):
-    return render(request, "inc/tags.html",{"tags": TAGS})
+def question(request, i: int):
+    quest = Question.objects.get_question_by_id(i)[0]
+    answers = pagination(Answer.objects.get_answers_by_question(i), request)
+    tags = Tag.objects.all().values()
+    tags_for_quest = quest.get_tags().values()
+    return render(request, "question_page.html", {'question': quest, "answers": answers, "tags": tags,
+                                                  "tags_for_quest": tags_for_quest})
+
+    # users = User.objects.all()
+    # user = request.user
+
+
+def tags(request, i: int):
+    tag = Tag.objects.get_tag_by_id(i)[0]
+    return render(request, "inc/tags.html", {"tag": tag})
+
+
+def questions_with_tags(request, tag_title):
+    content = pagination(Question.objects.get_questions_by_tag_title(tag_title), request)
+    tags = Tag.objects.all().values()
+    return render(request, "index.html", {"questions": content, "tags": tags})
+
+
+def setting(request):
+    tags = Tag.objects.all().values()
+    return render(request, "setting.html", {"tags": tags})

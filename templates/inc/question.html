@@ -1,11 +1,38 @@
 {% load static %}
 <div class="row question">
-        <div class="col-2">
-            <img class="avatar-question" src="{% static 'img/Capibers.jpg' %}" alt="">
+    <div class="col-2">
+        <img class="avatar-question" src="{% static 'img/Capibers.jpg' %}" alt="">
+    </div>
+    <div class="col-10">
+
+        <h3><a href="{% url 'question' question.id %}">{{ question.title }}</a> Tags:
+        {% for tag in tags_for_quest %}
+            <a href="{% url 'question_tag' tag.title %}">{{ tag.title }}</a>
+        {% endfor %}
+        </h3>
+        <p>{{ question.text }}</p>
+    </div>
+    <div class="col-md-6 d-flex justify-content-left" style="padding-top: 10px">
+        <div>
+            <button style="background-color: #fff; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(27, 31, 35, 0.15);">
+                Answers({{ answers|length }})
+            </button>
         </div>
-        <div class="col-10">
-            <h3><a href="{% url 'question' question.number %}">{{ question.title }}</a></h3>
-            <p>{{ question.text }}</p>
+        <div>
+            <button style="background-color: #fff; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(27, 31, 35, 0.15);">
+                I like it!
+            </button>
+        </div>
+        <div>
+            {% if question.likes > 0 %}
+                <div style="color: #00ff00">Rating:{{ question.likes }}</div>
+            {% elif question.likes == 0 %}
+                <div style="color: #eeee00">Rating:{{ question.likes }}</div>
+            {% else %}
+                <div style="color: #ff0000">Rating:{{ question.likes }}</div>
+            {% endif %}
         </div>
 
+
+    </div>
 </div>

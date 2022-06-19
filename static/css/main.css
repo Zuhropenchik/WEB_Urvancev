@@ -7,10 +7,22 @@ main >.container {
     margin: 20px;
     padding: 10px;
 }
+.answer {
+    border: 2px solid gray;
+    border-radius: 7px;
+    margin: 30px 75px 20px 50px;
+    padding: 10px;
+}
 .avatar-question {
     width: 150px;
     height: 150px;
     padding: 0px 20px 0px 0px;
+
+}
+.avatar-answer {
+    width: 80px;
+    height: 80px;
+    padding: 0px 0px 0px 0px;
 
 }
 .avatar-navbar {
