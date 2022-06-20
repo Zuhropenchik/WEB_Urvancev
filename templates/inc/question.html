@@ -24,12 +24,10 @@
             </button>
         </div>
         <div>
-            {% if question.likes > 0 %}
+            {% if question.likes > 10 %}
                 <div style="color: #00ff00">Rating:{{ question.likes }}</div>
-            {% elif question.likes == 0 %}
-                <div style="color: #eeee00">Rating:{{ question.likes }}</div>
             {% else %}
-                <div style="color: #ff0000">Rating:{{ question.likes }}</div>
+                <div style="color: #111111">Rating:{{ question.likes }}</div>
             {% endif %}
         </div>
 

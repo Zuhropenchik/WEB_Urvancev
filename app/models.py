@@ -27,6 +27,7 @@ class TagManager(models.Manager):
     def get_tag_by_id(self, tag_id):
         return self.filter(id=tag_id)
 
+
 class Tag(models.Model):
     objects = TagManager()
     title = models.CharField(max_length=50, verbose_name="Tag")
@@ -37,7 +38,7 @@ class Tag(models.Model):
 
 class QuestionManager(models.Manager):
     def get_popular(self):
-        return self.filter(likes__gt=10)
+        return sorted(self.filter(likes__gt=10), key=lambda question: question.likes, reverse=True)
 
     def get_recent(self):
         return self.filter(created_date__gt=now())
@@ -89,7 +90,13 @@ class Answer(models.Model):
         return self.author
 
 
+class LikeManager(models.Manager):
+    def get_all(self):
+        return self.all()
+
+
 class Like(models.Model):
+    objects = LikeManager()
     user = models.ForeignKey(User, related_name='likes', on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
 

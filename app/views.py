@@ -4,12 +4,8 @@ from django.core.paginator import Paginator
 from .models import Question, Tag, User, Answer, Like
 from django.db.models import Count
 
-TAGS = [
-    {
-        "title": f"tag#{i}",
-        "number": i,
-    } for i in range(20)
-]
+
+
 PAGINATION_SIZE = 10
 
 
@@ -17,7 +13,6 @@ def pagination(list_obj, request):
     paginator = Paginator(list_obj, PAGINATION_SIZE)
     page = request.GET.get('page')
     content = paginator.get_page(page)
-
     return content
 
 
@@ -43,7 +38,7 @@ def reg(request):
 
 
 def hot(request):
-    content = pagination(sorted(Question.objects.get_popular(), key=lambda question: question.likes, reverse=True), request)
+    content = pagination(Question.objects.get_popular(), request)
     tags = Tag.objects.all().values()
     return render(request, "index.html", {"questions": content, "tags": tags})
 
