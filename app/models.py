@@ -37,7 +37,7 @@ class Tag(models.Model):
 
 class QuestionManager(models.Manager):
     def get_popular(self):
-        return self.filter(likes__gt=-4)
+        return self.filter(likes__gt=10)
 
     def get_recent(self):
         return self.filter(created_date__gt=now())

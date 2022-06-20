@@ -43,8 +43,7 @@ def reg(request):
 
 
 def hot(request):
-    content = pagination(Question.objects.get_popular(), request)
-    content = sorted(content, key=lambda question: question.likes, reverse=True)
+    content = pagination(sorted(Question.objects.get_popular(), key=lambda question: question.likes, reverse=True), request)
     tags = Tag.objects.all().values()
     return render(request, "index.html", {"questions": content, "tags": tags})
 
@@ -57,8 +56,6 @@ def question(request, i: int):
     return render(request, "question_page.html", {'question': quest, "answers": answers, "tags": tags,
                                                   "tags_for_quest": tags_for_quest})
 
-    # users = User.objects.all()
-    # user = request.user
 
 
 def tags(request, i: int):

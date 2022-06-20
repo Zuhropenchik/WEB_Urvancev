@@ -1,0 +1,21 @@
+<div class="row">
+  <div class="col-3">
+      <span class="step-links">
+        <ul class="pagination" style="margin: 14px">
+
+            {% if answers.has_previous %}
+          <li class="btn btn-primary paginator_button" ><a href="?page={{ answers.previous_page_number }}">Previous</a></li>
+          <li class="btn btn-primary paginator_button" ><a href="?page={{ answers.previous_page_number }}">{{ answers.previous_page_number }}</a></li>
+            {% endif %}
+
+          <li class="btn btn-primary paginator_button"><a href="?page={{ answers.page_number }}">{{ answers.number }}</a></li>
+
+            {% if answers.has_next %}
+          <li class="btn btn-primary paginator_button" ><a href="?page={{ answers.next_page_number }}">{{ answers.next_page_number }}</a></li>
+          <li class="btn btn-primary paginator_button" ><a href="?page={{ answers.next_page_number }}">Next</a></li>
+            {% endif %}
+
+        </ul>
+      </span>
+  </div>
+</div>
