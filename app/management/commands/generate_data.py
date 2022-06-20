@@ -10,7 +10,7 @@ from app.models import (
 
 import random
 
-GENERATION_ORDER = 10000
+GENERATION_ORDER = 1
 
 
 class Command(BaseCommand):
@@ -23,9 +23,9 @@ class Command(BaseCommand):
     def generate_users(self):
         for i in range(GENERATION_ORDER):
             user = User()
-            user.username = f'Username{i}'
-            user.email = f'{i}@live.com'
-            user.password = "qwerty"
+            user.username = f'User{i}'
+            user.email = f'{i}@example.com'
+            user.password = "123"
 
             user.save()
 
@@ -41,7 +41,7 @@ class Command(BaseCommand):
             author = random.choice(User.objects.all())
             q = Question()
             q.title = f'Question {i}'
-            q.text = f'How to do the {i} task?'
+            q.text = f'I dont know help me(('
             q.author = author
             q.save()
             q.tags.add(random.choice(Tag.objects.all()))
