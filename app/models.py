@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Count
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.utils.timezone import now
@@ -36,9 +37,28 @@ class Tag(models.Model):
         return self.title
 
 
+class LikeManager(models.Manager):
+    def get_all(self):
+        return self.all()
+
+
+class Like(models.Model):
+    objects = LikeManager()
+    user = models.ForeignKey(User, related_name='likes', on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+
+    object_id = models.PositiveIntegerField()
+    like_object = GenericForeignKey('content_type', 'object_id')
+
+    def __str__(self):
+        return self.like_object.__str__()
+
+
 class QuestionManager(models.Manager):
     def get_popular(self):
-        return sorted(self.filter(likes__gt=10), key=lambda question: question.likes, reverse=True)
+        return self.annotate(count=Count('like', distinct=True)).order_by('-count')
+
+
 
     def get_recent(self):
         return self.filter(created_date__gt=now())
@@ -63,7 +83,10 @@ class Question(models.Model):
     create_date = models.DateTimeField(blank=True, auto_now=True)
     title = models.CharField(max_length=256)
     text = models.CharField(max_length=1000, blank=True)
-    likes = models.IntegerField(default=0)
+    like = GenericRelation(Like)
+
+    def likes(self):
+        return Like.objects.filter(object_id=self.id).count()
 
     def __str__(self):
         return self.title
@@ -73,9 +96,8 @@ class Question(models.Model):
 
 
 class AnswerManager(models.Manager):
-
     def get_answers_by_question(self, question_id):
-        return self.filter(question__id=question_id)
+        return self.filter(question__id=question_id).annotate(count=Count('like')).order_by('-count')
 
 
 class Answer(models.Model):
@@ -84,21 +106,10 @@ class Answer(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     content = models.TextField(blank=True)
     is_correct = models.BooleanField(default=False)
-    likes = models.IntegerField(default=0)
+    like = GenericRelation(Like)
+
+    def likes(self):
+        return Like.objects.filter(object_id=self.id).count()
 
     def get_author(self):
         return self.author
-
-
-class LikeManager(models.Manager):
-    def get_all(self):
-        return self.all()
-
-
-class Like(models.Model):
-    objects = LikeManager()
-    user = models.ForeignKey(User, related_name='likes', on_delete=models.CASCADE)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-
-    object_id = models.PositiveIntegerField()
-    like_object = GenericForeignKey('content_type', 'object_id')

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-
+from itertools import chain
 from app.models import (
     User,
     Tag,
@@ -15,11 +15,11 @@ class Command(BaseCommand):
     GENERATION_ORDER = 1
 
     def handle(self, *args, **options):
-        # self.generate_users()
-        # self.generate_tags()
-        # self.generate_questions()
+        self.generate_users()
+        self.generate_tags()
+        self.generate_questions()
         self.generate_answers()
-        # self.generate_likes()
+        self.generate_likes()
 
     def generate_users(self):
         users = []
@@ -64,5 +64,12 @@ class Command(BaseCommand):
         Answer.objects.bulk_create(answers)
 
     def generate_likes(self):
+        likes = []
         for i in range(self.GENERATION_ORDER * 200):
-            like = Like()
+            author = random.choice(User.objects.all())
+            answer = random.choice(Answer.objects.all())
+            question = random.choice(Question.objects.all())
+            liked_object = random.choice([answer, question])
+            like = Like(like_object=liked_object, user=author)
+            likes.append(like)
+        Like.objects.bulk_create(likes)

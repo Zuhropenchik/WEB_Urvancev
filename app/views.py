@@ -18,9 +18,11 @@ def pagination(list_obj, request):
 
 
 def index(request):
-    content = pagination(Question.objects.all().values(), request)
+    content = pagination(Question.objects.all().annotate(answers_count=Count("answer", distinct=True)),
+                         request)
     tags = Tag.objects.all().values()
     return render(request, "index.html", {"questions": content, "tags": tags})
+
 
 def login_view(request):
     if request.method == 'GET':
@@ -36,6 +38,7 @@ def login_view(request):
                 return redirect(reverse('login'))
 
     return render(request, "login.html", {"form": user_form})
+
 
 def ask(request):
     tags = Tag.objects.all().values()
@@ -53,19 +56,18 @@ def reg(request):
 
 
 def hot(request):
-    content = pagination(Question.objects.get_popular(), request)
+    content = pagination(Question.objects.get_popular().annotate(answers_count=Count("answer", distinct=True)), request)
     tags = Tag.objects.all().values()
     return render(request, "index.html", {"questions": content, "tags": tags})
 
 
 def question(request, i: int):
-    quest = Question.objects.get_question_by_id(i)[0]
+    quest = Question.objects.get_question_by_id(i).annotate(answers_count=Count("answer", distinct=True))[0]
     answers = pagination(Answer.objects.get_answers_by_question(i), request)
     tags = Tag.objects.all().values()
     tags_for_quest = quest.get_tags().values()
-    return render(request, "question_page.html", {'question': quest, "answers": answers, "tags": tags,
-                                                  "tags_for_quest": tags_for_quest})
-
+    return render(request, "question_page.html", {'question': quest, "answers": answers,
+                                                  "tags": tags, "tags_for_quest": tags_for_quest})
 
 
 def tags(request, i: int):
@@ -74,7 +76,8 @@ def tags(request, i: int):
 
 
 def questions_with_tags(request, tag_title):
-    content = pagination(Question.objects.get_questions_by_tag_title(tag_title), request)
+    content = pagination(Question.objects.get_questions_by_tag_title(tag_title).annotate(answers_count=Count("answer", distinct=True)),
+                         request)
     tags = Tag.objects.all().values()
     return render(request, "index.html", {"questions": content, "tags": tags})
 
