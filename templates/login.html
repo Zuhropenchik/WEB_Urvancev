@@ -1,0 +1,36 @@
+{% extends "inc/base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+    <h3 class="mb-5">Log In</h3>
+    <div class="card p-5">
+        <form action="/login/" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button class="btn" type="submit">Login</button>
+        </form>
+    </div>
+{% endblock %}
+
+{#{% load static %}#}
+{#{% block content %}#}
+{#    <h2 class="mt-5">Authorization</h2>#}
+{#    <form>#}
+{#        <div class="mb-3">#}
+{#            <div class="input">#}
+{#                <label for="exampleInputEmail1" class="question-title">Email:</label>#}
+{#                <input type="email" class="form-control" id="Question title" aria-describedby="emailHelp">#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="mb-2">#}
+{#            <div class="input">#}
+{#                <label for="exampleInputEmail1" class="question-title">Password:</label>#}
+{#                <input type="email" class="form-control" id="Question title" aria-describedby="emailHelp">#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="error">#}
+{#            Incorrect data entered#}
+{#        </div>#}
+{#        <button type="submit" class="btn btn-primary">Log in!</button>#}
+{#    </form>#}
+{#{% endblock %}#}

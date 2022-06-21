@@ -1,10 +1,11 @@
-from django.shortcuts import render
-from django.core.paginator import Paginator
+from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from .models import Question, Tag, User, Answer, Like
 from django.db.models import Count
-
-
+from django.urls import reverse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from .forms import LoginForm
 
 PAGINATION_SIZE = 10
 
@@ -21,15 +22,29 @@ def index(request):
     tags = Tag.objects.all().values()
     return render(request, "index.html", {"questions": content, "tags": tags})
 
+def login_view(request):
+    if request.method == 'GET':
+        user_form = LoginForm()
+    elif request.method == 'POST':
+        user_form = LoginForm(data=request.POST)
+        if user_form.is_valid():
+            user = authenticate(request, **user_form.cleaned_data)
+            if user:
+                login(request, user)
+                return redirect(reverse('index'))
+            else:
+                return redirect(reverse('login'))
+
+    return render(request, "login.html", {"form": user_form})
 
 def ask(request):
     tags = Tag.objects.all().values()
     return render(request, "ask.html", {"tags": tags})
 
 
-def auth(request):
+def login(request):
     tags = Tag.objects.all().values()
-    return render(request, "auth.html", {"tags": tags})
+    return render(request, "login.html", {"tags": tags})
 
 
 def reg(request):

@@ -19,7 +19,7 @@ class Command(BaseCommand):
         # self.generate_tags()
         # self.generate_questions()
         self.generate_answers()
-        self.generate_likes()
+        # self.generate_likes()
 
     def generate_users(self):
         users = []
@@ -57,7 +57,7 @@ class Command(BaseCommand):
         for i in range(self.GENERATION_ORDER * 100):
             author = random.choice(User.objects.all())
             a = Answer()
-            a.text = f'answer {i}'
+            a.content = f'answer {i}'
             a.author = author
             a.question = random.choice(Question.objects.all())
             answers.append(a)
