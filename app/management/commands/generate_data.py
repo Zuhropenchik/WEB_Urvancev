@@ -15,11 +15,11 @@ class Command(BaseCommand):
     GENERATION_ORDER = 1
 
     def handle(self, *args, **options):
-        self.generate_users()
-        self.generate_tags()
+        # self.generate_users()
+        # self.generate_tags()
         self.generate_questions()
-        self.generate_answers()
-        self.generate_likes()
+        # self.generate_answers()
+        # self.generate_likes()
 
     def generate_users(self):
         users = []
@@ -47,7 +47,6 @@ class Command(BaseCommand):
             q.title = f'Question {i}'
             q.text = f'I dont know, help me:('
             q.author = author
-            q.save()
             q.tags.add(random.choice(Tag.objects.all()))
             questions.append(q)
         Question.objects.bulk_create(questions)
