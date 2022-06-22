@@ -1,12 +1,20 @@
 {% extends "inc/base.html" %}
 {% load static %}
+{% load bootstrap4 %}
 {% block content %}
     <h2 class="mt-5">Question</h2>
     {% include 'inc/question.html' %}
+    <div>
+        <form method="post" action="/question/{{ question.id }}">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button class="btn btn-primary mb-5" type="submit">Post your answer</button>
+        </form>
+    </div>
     {% for answer in answers %}
         {% include 'inc/answer.html' %}
     {% endfor %}
-    {%  include 'inc/answer_paginator.html' %}
+    {% include 'inc/answer_paginator.html' %}
 {% endblock %}
 
 

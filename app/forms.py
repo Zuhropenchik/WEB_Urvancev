@@ -25,8 +25,10 @@ class LoginForm(forms.Form):
 class SignUpForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={"class": "form-group mb-3"}), label="login", max_length=50)
     email = forms.EmailField(widget=forms.EmailInput(attrs={"class": "form-group mb-3"}), label="Email", max_length=50)
-    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-group mb-3"}), label='Password', max_length=50)
-    password_repeat = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-group mb-3"}), label='Repeat password', max_length=50)
+    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-group mb-3"}), label='Password',
+                               max_length=50)
+    password_repeat = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-group mb-3"}),
+                                      label='Repeat password', max_length=50)
 
     avatar = forms.FileField(widget=forms.FileInput(attrs={"class": "form-group mb-3"}), label="Avatar", required=False)
 
@@ -50,9 +52,9 @@ class SignUpForm(forms.Form):
 
 
 class AskForm(forms.ModelForm):
-    tag_list = forms.CharField(widget=forms.TextInput(attrs={"class": "form-group mb-3",
-                                                             "placeholder": "Specify one or more tags"}),
-                               label="Tags")
+    tags = forms.CharField(widget=forms.TextInput(attrs={"class": "form-group mb-3",
+                                                         "placeholder": "Specify one or more tags"}),
+                           label="Tags")
 
     class Meta:
         model = Question
@@ -68,7 +70,7 @@ class AskForm(forms.ModelForm):
         }
 
     def clean_tags(self):
-        data = self.data['tag_list']
+        data = self.data['tags']
         if len(data) > 49:
             raise ValidationError("Tags should be less then 50 symbols.")
         return data
@@ -84,3 +86,24 @@ class AskForm(forms.ModelForm):
         if len(data) > 999:
             raise ValidationError("Description should be less then 1000 symbols.")
         return data
+
+
+class AnswerForm(forms.ModelForm):
+    class Meta:
+        model = Answer
+        fields = ('content',)
+        widgets = {
+            "content": forms.Textarea(
+                attrs={'rows': 4, 'cols': 5, "class": "form-group mb-3", "placeholder": "Input your answer"})
+        }
+
+    def clean_text(self):
+        data = self.data['content']
+        if len(data) > 499:
+            raise ValidationError("Description should be less then 500 symbols.")
+        return data
+
+    def save_fun(self, profile, question):
+        ans = Answer.objects.create(author=profile, question=question, text=self.cleaned_data['content'])
+        ans.save()
+        return self

@@ -98,12 +98,15 @@ class AnswerManager(models.Manager):
     def get_answers_by_question(self, question_id):
         return self.filter(question__id=question_id).annotate(count=Count('like')).order_by('-count')
 
+    def get_answers_by_id(self, answer_id):
+        return self.filter(id=answer_id)
+
 
 class Answer(models.Model):
     objects = AnswerManager()
     question = models.ForeignKey(Question, on_delete=models.CASCADE, default=1)
     author = models.ForeignKey(Profile, on_delete=models.CASCADE, default=1)
-    content = models.TextField(blank=True)
+    content = models.TextField(blank=True, max_length=500)
     is_correct = models.BooleanField(default=False)
     like = GenericRelation(Like)
 

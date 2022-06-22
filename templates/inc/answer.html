@@ -1,10 +1,14 @@
 {% load static %}
+{% if answer.get_author.user == user %}
+<div class="row answer" style="border-color: #0071f8">
+{% else %}
 <div class="row answer">
+{% endif %}
     <div class="col-2">
         <img class="avatar-answer" src="{% static 'img/Capibers.jpg' %}" alt="">
     </div>
     <div class="col-10">
-        <strong>{{ answer.get_author }}</strong>
+        <strong class="tags"><a href="{% url 'answer' answer.id %}">{{ answer.get_author }}</a></strong>
         <p>{{ answer.content }}</p>
     </div>
     {% if answer.is_correct %}
