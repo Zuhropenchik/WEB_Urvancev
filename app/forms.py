@@ -107,3 +107,29 @@ class AnswerForm(forms.ModelForm):
         ans = Answer.objects.create(author=profile, question=question, text=self.cleaned_data['content'])
         ans.save()
         return self
+class SettingsForm(forms.ModelForm):
+    avatar = forms.FileField(widget=forms.FileInput(attrs={"class": "form-group mb-3"}), label="Avatar", required=False)
+    username = forms.CharField(disabled=True)
+    email = forms.EmailField(widget=forms.EmailInput(attrs={"class": "form-group mb-3"}), label="Email", max_length=64)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'avatar', ]
+        labels = {
+            "username": "Login",
+            "first_name": "Name",
+        }
+        widgets = {
+            "username": forms.TextInput(attrs={"class": "form-group mb-3", "readonly": "readonly"}),
+            "first_name": forms.TextInput(attrs={"class": "form-group mb-3"})
+        }
+        help_texts = {
+            'username': None,
+        }
+
+    def save(self, *args, **kwargs):
+        temp_user = super().save()
+        if (self.cleaned_data['avatar']):
+            temp_user.profile_related.avatar = self.cleaned_data['avatar']
+            temp_user.profile_related.save()
+        return temp_user

@@ -9,13 +9,13 @@ from django.contrib.auth.models import User
 class ProfileManager(models.Manager):
     def get_top_users(self):
         # sum_rating = self.annotate(answers=Sum('answer'))
-        return self.annotate(answers=Count('answer')).order_by('-answers')[:12]
+        return self.annotate(answers=(Count('answer')+Count('question'))).order_by('-answers')[:12]
 
 
 class Profile(models.Model):
     user = models.OneToOneField(User, null=True, related_name='profile_related', on_delete=models.CASCADE)
     objects = ProfileManager()
-    avatar = models.ImageField(upload_to='images', null=True, blank=True)
+    avatar = models.ImageField(null=True, blank=True, default='default_avatar.png', upload_to="avatar/%Y/%m/%d",)
     bio = models.TextField(null=True, blank=True)
 
     def __str__(self):
@@ -58,9 +58,6 @@ class Like(models.Model):
 class QuestionManager(models.Manager):
     def get_popular(self):
         return self.annotate(count=Count('like', distinct=True)).order_by('-count')
-
-    def get_recent(self):
-        return self.filter(created_date__gt=now())
 
     def get_question_by_id(self, question_id):
         return self.filter(id=question_id)

@@ -6,9 +6,11 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound, HttpResponseRedirect
-from .forms import LoginForm, SignUpForm, AskForm, AnswerForm
+from .forms import LoginForm, SignUpForm, AskForm, AnswerForm, SettingsForm
 from django.contrib import auth
 from django.contrib.auth.models import User
+from django.views.decorators.http import require_http_methods, require_POST
+from django.forms.models import model_to_dict
 
 PAGINATION_SIZE = 10
 
@@ -113,7 +115,7 @@ def question(request, i: int):
                                                 author=Profile.objects.get(user=request.user))
             temp_answer.save()
             if temp_answer:
-                    return redirect(reverse("answer", args=[temp_answer.id]))
+                return redirect(reverse("answer", args=[temp_answer.id]))
     return render(request, "question_page.html",
                   {'form': form, 'question': quest, "answers": answers, "top_users": top_users,
                    "tags": tags, "tags_for_quest": tags_for_quest})
@@ -132,16 +134,6 @@ def hot(request):
     return render(request, "index.html", {"questions": content, "tags": tags, "top_users": top_users})
 
 
-# def question(request, i: int):
-#     quest = Question.objects.get_question_by_id(i).annotate(answers_count=Count("answer", distinct=True))[0]
-#     answers = pagination(Answer.objects.get_answers_by_question(i), request)
-#     tags = Tag.objects.get_popular()
-#     top_users = Profile.objects.get_top_users()
-#     tags_for_quest = quest.get_tags().values()[:3]
-#     return render(request, "question_page.html", {'question': quest, "answers": answers, "top_users": top_users,
-#                                                   "tags": tags, "tags_for_quest": tags_for_quest})
-
-
 def tags(request, i: int):
     tag = Tag.objects.get_tag_by_id(i)[0]
     return render(request, "inc/tags.html", {"tag": tag})
@@ -156,13 +148,31 @@ def questions_with_tags(request, tag_title):
     return render(request, "index.html", {"questions": content, "tags": tags, "top_users": top_users})
 
 
-def setting(request):
-    tags = Tag.objects.get_popular()
-    top_users = Profile.objects.get_top_users()
-    return render(request, "setting.html", {"tags": tags, "top_users": top_users})
+# def setting(request):
+#     tags = Tag.objects.get_popular()
+#     top_users = Profile.objects.get_top_users()
+#     return render(request, "setting.html", {"tags": tags, "top_users": top_users})
+
 
 def answer(request, i: int):
     answer = Answer.objects.get_answers_by_id(i)[0]
     tags = Tag.objects.get_popular()
     top_users = Profile.objects.get_top_users()
-    return render(request, "answer_page.html", {"answer":answer, "tags": tags, "top_users": top_users})
+    return render(request, "answer_page.html", {"answer": answer, "tags": tags, "top_users": top_users})
+
+
+@login_required(login_url="login")
+@require_http_methods(["GET", "POST"])
+def setting(request):
+    tags = Tag.objects.get_popular()
+    top_users = Profile.objects.get_top_users()
+    if request.method == "GET":
+        initial_data = model_to_dict(request.user)
+        initial_data['avatar'] = request.user.profile_related.avatar
+        form = SettingsForm(initial=initial_data)
+    else:
+        form = SettingsForm(data=request.POST, files=request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse("setting"))
+    return render(request, 'setting.html', {"form": form, "tags": tags, "top_users": top_users})
