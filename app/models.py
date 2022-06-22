@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.utils.timezone import now
@@ -8,7 +8,8 @@ from django.contrib.auth.models import User
 
 class ProfileManager(models.Manager):
     def get_top_users(self):
-        return self.annotate(answers=Count('answer_related')).order_by('-answers')[:5]
+        # sum_rating = self.annotate(answers=Sum('answer'))
+        return self.annotate(answers=Count('answer')).order_by('-answers')[:12]
 
 
 class Profile(models.Model):
@@ -24,6 +25,9 @@ class Profile(models.Model):
 class TagManager(models.Manager):
     def get_tag_by_id(self, tag_id):
         return self.filter(id=tag_id)
+
+    def get_popular(self):
+        return self.all().annotate(count=Count('question')).order_by('-count')[:20]
 
 
 class Tag(models.Model):
@@ -41,7 +45,7 @@ class LikeManager(models.Manager):
 
 class Like(models.Model):
     objects = LikeManager()
-    user = models.ForeignKey(Profile, related_name='likes', on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
 
     object_id = models.PositiveIntegerField()
@@ -98,7 +102,7 @@ class AnswerManager(models.Manager):
 class Answer(models.Model):
     objects = AnswerManager()
     question = models.ForeignKey(Question, on_delete=models.CASCADE, default=1)
-    author = models.ForeignKey(Profile, related_name='answer_related', on_delete=models.CASCADE, default=1)
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE, default=1)
     content = models.TextField(blank=True)
     is_correct = models.BooleanField(default=False)
     like = GenericRelation(Like)

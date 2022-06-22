@@ -68,9 +68,9 @@ main > .container {
     text-decoration: none;
 }
 .sidebar_column {
-        -webkit-column-width: 30px;
-    -moz-column-width: 30px;
-    column-width: 30px;
+        -webkit-column-width: 50px;
+    -moz-column-width: 50px;
+    column-width: 50px;
     -webkit-column-count: 2;
     -moz-column-count: 2;
     column-count: 2;

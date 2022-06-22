@@ -54,14 +54,14 @@
 
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page"
-                                   href="{% url 'login' %}">{{ user.username }}</a>
+                                    href="{% url 'setting' %}">{{ user.username }}</a>
                             </li>
 
 
                         </ul>
                     </div>
                     <div>
-                        <a href="{% url 'setting' %}"><img class="avatar-navbar"
+                        <a><img class="avatar-navbar" style="width:37px; height:37px"
                                                            src="{% static 'img/icon.png' %}"
                                                            alt=""></a>
                     </div>
@@ -105,7 +105,13 @@
                 {% endblock %}
                 <h3 class = "mt-4">Popular members</h3>
                 <div class="mt-5, sidebar_column">
-
+                {% block top_users %}
+                    <div class="mt-5, sidebar_column">
+                        {% for top_user in top_users %}
+                            {% include "inc/top_users.html" %}
+                        {% endfor %}
+                    </div>
+                {% endblock %}
                 </div>
             </div>
 

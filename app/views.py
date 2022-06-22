@@ -23,8 +23,9 @@ def pagination(list_obj, request):
 def index(request):
     content = pagination(Question.objects.all().annotate(answers_count=Count("answer", distinct=True)),
                          request)
-    tags = Tag.objects.all().values()[:20]
-    return render(request, "index.html", {"questions": content, "tags": tags})
+    tags = Tag.objects.get_popular()
+    top_users = Profile.objects.get_top_users()
+    return render(request, "index.html", {"questions": content, "tags": tags, "top_users": top_users})
 
 
 def login_view(request):
@@ -49,10 +50,10 @@ def logout_view(request):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-@login_required(redirect_field_name="login")
-def setting(request):
-    tags = Tag.objects.all().values()[:20]
-    return render(request, "setting.html", {"tags": tags})
+# @login_required(redirect_field_name="login")
+# def setting(request):
+#     tags = Tag.objects.all().values()[:20]
+#     return render(request, "setting.html", {"tags": tags})
 
 
 # @login_required(redirect_field_name="login")
@@ -83,32 +84,37 @@ def setting(request):
 
 
 def ask(request):
-    tags = Tag.objects.all().values()[:20]
-    return render(request, "ask.html", {"tags": tags})
+    tags = Tag.objects.get_popular()
+    top_users = Profile.objects.get_top_users()
+    return render(request, "ask.html", {"tags": tags, "top_users": top_users})
 
 
 def login(request):
-    tags = Tag.objects.all().values()[:20]
-    return render(request, "login.html", {"tags": tags})
+    tags = Tag.objects.get_popular()
+    top_users = Profile.objects.get_top_users()
+    return render(request, "login.html", {"tags": tags, "top_users": top_users})
 
 
 def reg(request):
-    tags = Tag.objects.all().values()[:20]
-    return render(request, "reg.html", {"tags": tags})
+    tags = Tag.objects.get_popular()
+    top_users = Profile.objects.get_top_users()
+    return render(request, "reg.html", {"tags": tags, "top_users": top_users})
 
 
 def hot(request):
     content = pagination(Question.objects.get_popular(), request)
-    tags = Tag.objects.all().values()[:20]
-    return render(request, "index.html", {"questions": content, "tags": tags})
+    tags = Tag.objects.get_popular()
+    top_users = Profile.objects.get_top_users()
+    return render(request, "index.html", {"questions": content, "tags": tags, "top_users": top_users})
 
 
 def question(request, i: int):
     quest = Question.objects.get_question_by_id(i).annotate(answers_count=Count("answer", distinct=True))[0]
     answers = pagination(Answer.objects.get_answers_by_question(i), request)
-    tags = Tag.objects.all().values()[:20]
+    tags = Tag.objects.get_popular()
+    top_users = Profile.objects.get_top_users()
     tags_for_quest = quest.get_tags().values()[:3]
-    return render(request, "question_page.html", {'question': quest, "answers": answers,
+    return render(request, "question_page.html", {'question': quest, "answers": answers, "top_users": top_users,
                                                   "tags": tags, "tags_for_quest": tags_for_quest})
 
 
@@ -121,10 +127,12 @@ def questions_with_tags(request, tag_title):
     content = pagination(
         Question.objects.get_questions_by_tag_title(tag_title).annotate(answers_count=Count("answer", distinct=True)),
         request)
-    tags = Tag.objects.all().values()[:20]
-    return render(request, "index.html", {"questions": content, "tags": tags})
+    tags = Tag.objects.get_popular()
+    top_users = Profile.objects.get_top_users()
+    return render(request, "index.html", {"questions": content, "tags": tags, "top_users": top_users})
 
 
 def setting(request):
-    tags = Tag.objects.all().values()[:20]
-    return render(request, "setting.html", {"tags": tags})
+    tags = Tag.objects.get_popular()
+    top_users = Profile.objects.get_top_users()
+    return render(request, "setting.html", {"tags": tags, "top_users": top_users})

@@ -12,14 +12,21 @@ import random
 
 
 class Command(BaseCommand):
-    GENERATION_ORDER = 10
+    GENERATION_ORDER = 20
 
     def handle(self, *args, **options):
         self.generate_user_and_profile()
+        profiles = Profile.objects.all()
         self.generate_tags()
-        self.generate_questions()
-        self.generate_answers()
-        self.generate_likes()
+        tags = Tag.objects.all()
+        self.generate_questions(profiles)
+        questions = Question.objects.all()
+        self.generate_answers(profiles, questions)
+        answers = Answer.objects.all()
+        self.generate_likes(profiles, questions, answers)
+        for question in questions:
+            for i in range(3):
+                question.tags.add(random.choice(tags))
 
     def generate_user_and_profile(self):
         def generate_user(num):
@@ -50,35 +57,34 @@ class Command(BaseCommand):
             tags.append(t)
         Tag.objects.bulk_create(tags)
 
-    def generate_questions(self):
+    def generate_questions(self, profiles):
         questions = []
         for i in range(self.GENERATION_ORDER * 10):
-            author = random.choice(Profile.objects.all())
+            author = random.choice(profiles)
             q = Question()
             q.title = f'Question {i}'
             q.text = f'I dont know, help me:('
             q.author = author
-            # q.tags.add(random.choice(Tag.objects.all()))
             questions.append(q)
         Question.objects.bulk_create(questions)
 
-    def generate_answers(self):
+    def generate_answers(self, profiles, questions):
         answers = []
         for i in range(self.GENERATION_ORDER * 100):
-            author = random.choice(Profile.objects.all())
+            author = random.choice(profiles)
             a = Answer()
             a.content = f'answer {i}'
             a.author = author
-            a.question = random.choice(Question.objects.all())
+            a.question = random.choice(questions)
             answers.append(a)
         Answer.objects.bulk_create(answers)
 
-    def generate_likes(self):
+    def generate_likes(self, profiles, questions, answers):
         likes = []
         for i in range(self.GENERATION_ORDER * 200):
-            author = random.choice(Profile.objects.all())
-            answer = random.choice(Answer.objects.all())
-            question = random.choice(Question.objects.all())
+            author = random.choice(profiles)
+            answer = random.choice(answers)
+            question = random.choice(questions)
             liked_object = random.choice([answer, question])
             like = Like(like_object=liked_object, user=author)
             likes.append(like)
