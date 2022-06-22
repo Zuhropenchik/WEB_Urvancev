@@ -4,11 +4,11 @@ from .models import Question, Tag, Profile, Answer, Like
 from django.db.models import Count
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound, HttpResponseRedirect
-from .forms import LoginForm
+from .forms import LoginForm, SignUpForm
 from django.contrib import messages
 from django.contrib import auth
+from django.contrib.auth.models import User
 
 PAGINATION_SIZE = 10
 
@@ -28,7 +28,7 @@ def index(request):
     return render(request, "index.html", {"questions": content, "tags": tags, "top_users": top_users})
 
 
-def login_view(request):
+def login(request):
     if request.method == 'GET':
         user_form = LoginForm()
     elif request.method == 'POST':
@@ -41,8 +41,32 @@ def login_view(request):
             else:
                 user_form.add_error('password', "Not such Login/Password")
                 user_form.add_error('username', "")
+    tags = Tag.objects.get_popular()
+    top_users = Profile.objects.get_top_users()
+    return render(request, "login.html", {"form": user_form, "tags": tags, "top_users": top_users})
 
-    return render(request, "login.html", {"form": user_form})
+
+def signup(request):
+    popular_tags = Tag.objects.get_popular()
+    top_users = Profile.objects.get_top_users()
+    if request.method == 'GET':
+        user_form = SignUpForm()
+    elif request.method == 'POST':
+        user_form = SignUpForm(data=request.POST)
+        if user_form.is_valid():
+            user = User.objects.create_user(username=user_form.cleaned_data['username'],
+                                            email=user_form.cleaned_data['email'],
+                                            password=user_form.cleaned_data['password'],
+                                            )
+            user.save()
+            profile = Profile.objects.create(user=user)
+            profile.save()
+            if user:
+                login(request, user)
+                return redirect(reverse('index'))
+            else:
+                return redirect(reverse('login'))
+    return render(request, "reg.html", {"form": user_form, "tags": popular_tags, "top_users": top_users})
 
 
 def logout_view(request):
@@ -50,49 +74,10 @@ def logout_view(request):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-# @login_required(redirect_field_name="login")
-# def setting(request):
-#     tags = Tag.objects.all().values()[:20]
-#     return render(request, "setting.html", {"tags": tags})
-
-
-# @login_required(redirect_field_name="login")
-# def profile_edit(request):
-#     if request.method == 'GET':
-#         p_form = ProfileEdit(instance=request.user.profile)
-#         u_form = UserEdit(instance=request.user)
-#
-#     elif request.method == 'POST':
-#         p_form = ProfileEdit(data=request.POST, instance=request.user.profile)
-#         u_form = UserEdit(data=request.POST, instance=request.user)
-#         if p_form.is_valid() and u_form.is_valid():
-#             u_form.instance.save()
-#             p_form.instance.save()
-#             messages.success(request, f"Your account has been updated!")
-#             return redirect('profile_edit')
-#         else:
-#             messages.success(request, f"Your account has not been updated :(")
-#             return redirect(reverse('profile_edit'))
-#
-#     content = {
-#         "p_form": p_form,
-#         "u_form": u_form,
-#         "tags": Tag.objects.all().values()[:100]
-#     }
-#
-#     return render(request, "profile_edit.html", content)
-
-
 def ask(request):
     tags = Tag.objects.get_popular()
     top_users = Profile.objects.get_top_users()
     return render(request, "ask.html", {"tags": tags, "top_users": top_users})
-
-
-def login(request):
-    tags = Tag.objects.get_popular()
-    top_users = Profile.objects.get_top_users()
-    return render(request, "login.html", {"tags": tags, "top_users": top_users})
 
 
 def reg(request):

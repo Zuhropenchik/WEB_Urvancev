@@ -1,36 +1,50 @@
 {% extends "inc/base.html" %}
 {% load static %}
+{% load bootstrap4 %}
+
 {% block content %}
-    <h2 class="mt-5">Registration</h2>
-    <form>
-        <div class="mb-3">
-            <div class="input">
-                <label for="exampleInputEmail1" class="question-title">Nickname</label>
-                <input type="email" class="form-control" id="Question title" aria-describedby="emailHelp">
-            </div>
-        </div>
-        <div class="mb-3">
-            <div class="input">
-                <label for="exampleInputEmail1" class="question-title">Email</label>
-                <input type="email" class="form-control" id="Question title" aria-describedby="emailHelp">
-            </div>
-        </div>
-        <div class="mb-3">
-            <div class="input">
-                <label for="exampleInputEmail1" class="question-title">Password</label>
-                <input type="email" class="form-control" id="Question title" aria-describedby="emailHelp">
-            </div>
-        </div>
-        <div class="mb-3">
-            <div class="input">
-                <label for="exampleInputEmail1" class="question-title">Repeat password</label>
-                <input type="email" class="form-control" id="Question title" aria-describedby="emailHelp">
-            </div>
-        </div>
-        <div class="error">
-            Password mismatch
-        </div>
-        <button type="submit" class="btn btn-primary">Create account</button>
-    </form>
+    <h3 class="mb-5">Registration</h3>
+    <div class="card p-5">
+        <form class="form" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button class="btn btn-primary" type="submit">Sign Up!</button>
+            <a style="font-size: 12px; color:#575656; text-decoration: none; margin-left: 16px" href="{% url "index" %}">Return to questions</a>
+        </form>
+    </div>
 {% endblock %}
+{#{% load static %}#}
+{#{% block content %}#}
+{#    <h2 class="mt-5">Registration</h2>#}
+{#    <form>#}
+{#        <div class="mb-3">#}
+{#            <div class="input">#}
+{#                <label for="exampleInputEmail1" class="question-title">Nickname</label>#}
+{#                <input type="email" class="form-control" id="Question title" aria-describedby="emailHelp">#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="mb-3">#}
+{#            <div class="input">#}
+{#                <label for="exampleInputEmail1" class="question-title">Email</label>#}
+{#                <input type="email" class="form-control" id="Question title" aria-describedby="emailHelp">#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="mb-3">#}
+{#            <div class="input">#}
+{#                <label for="exampleInputEmail1" class="question-title">Password</label>#}
+{#                <input type="email" class="form-control" id="Question title" aria-describedby="emailHelp">#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="mb-3">#}
+{#            <div class="input">#}
+{#                <label for="exampleInputEmail1" class="question-title">Repeat password</label>#}
+{#                <input type="email" class="form-control" id="Question title" aria-describedby="emailHelp">#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="error">#}
+{#            Password mismatch#}
+{#        </div>#}
+{#        <button type="submit" class="btn btn-primary">Create account</button>#}
+{#    </form>#}
+{#{% endblock %}#}
 
