@@ -5,12 +5,14 @@
     </div>
     <div class="col-10">
 
-        <h3><a href="{% url 'question' question.id %}">{{ question.title }}</a> Tags:
+        <h3 class = "tags"><a href="{% url 'question' question.id %}"
+                                            style="margin:10px;">{{ question.title }}</a> Tags:
             {% for tag in tags_for_quest %}
                 <a href="{% url 'question_tag' tag.title %}">{{ tag.title }}</a>
             {% endfor %}
         </h3>
         <p>{{ question.text }}</p>
+
     </div>
     <div class="col-md-6 d-flex justify-content-left" style="padding-top: 10px">
         <div>

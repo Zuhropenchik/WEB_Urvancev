@@ -1,7 +1,7 @@
-from django.core.management.base import BaseCommand, CommandError
-from itertools import chain
+from django.core.management.base import BaseCommand
+from django.contrib.auth.models import User
 from app.models import (
-    User,
+    Profile,
     Tag,
     Question,
     Answer,
@@ -12,24 +12,35 @@ import random
 
 
 class Command(BaseCommand):
-    GENERATION_ORDER = 1
+    GENERATION_ORDER = 10
 
     def handle(self, *args, **options):
-        # self.generate_users()
-        # self.generate_tags()
+        self.generate_user_and_profile()
+        self.generate_tags()
         self.generate_questions()
-        # self.generate_answers()
-        # self.generate_likes()
+        self.generate_answers()
+        self.generate_likes()
 
-    def generate_users(self):
-        users = []
+    def generate_user_and_profile(self):
+        def generate_user(num):
+            user_dict_repr = {
+                'username': f'User{num}',
+                'first_name': f'Zakhar{num}',
+                'last_name': f'Urvancev{num}',
+                'password': '1234',
+                'email': f'{num}@example.com',
+                'is_staff': False,
+                'is_active': True,
+                'is_superuser': False
+            }
+            return user_dict_repr
+        profiles = []
         for i in range(self.GENERATION_ORDER):
-            u = User()
-            u.username = f'User{i}'
-            u.email = f'{i}@example.com'
-            u.password = "123"
-            users.append(u)
-        User.objects.bulk_create(users)
+            user = User.objects.create_user(**generate_user(i))
+            p = Profile(user=user)
+            p.bio = f'My name is Zakhar{i}. I want to learning!'
+            profiles.append(p)
+        Profile.objects.bulk_create(profiles)
 
     def generate_tags(self):
         tags = []
@@ -42,19 +53,19 @@ class Command(BaseCommand):
     def generate_questions(self):
         questions = []
         for i in range(self.GENERATION_ORDER * 10):
-            author = random.choice(User.objects.all())
+            author = random.choice(Profile.objects.all())
             q = Question()
             q.title = f'Question {i}'
             q.text = f'I dont know, help me:('
             q.author = author
-            q.tags.add(random.choice(Tag.objects.all()))
+            # q.tags.add(random.choice(Tag.objects.all()))
             questions.append(q)
         Question.objects.bulk_create(questions)
 
     def generate_answers(self):
         answers = []
         for i in range(self.GENERATION_ORDER * 100):
-            author = random.choice(User.objects.all())
+            author = random.choice(Profile.objects.all())
             a = Answer()
             a.content = f'answer {i}'
             a.author = author
@@ -65,7 +76,7 @@ class Command(BaseCommand):
     def generate_likes(self):
         likes = []
         for i in range(self.GENERATION_ORDER * 200):
-            author = random.choice(User.objects.all())
+            author = random.choice(Profile.objects.all())
             answer = random.choice(Answer.objects.all())
             question = random.choice(Question.objects.all())
             liked_object = random.choice([answer, question])

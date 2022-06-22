@@ -45,20 +45,38 @@
                         <a class="nav-link disabled"></a>
                     </li>
                 </ul>
-                <div>
-                    <ul class="navbar-nav me-auto mb-2 mb-md-0">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'reg' %}">Sign up</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url 'login' %}">Sign in</a>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <a href="{% url 'setting' %}"><img class="avatar-navbar" src="{% static 'img/icon.png' %}"
-                                                       alt=""></a>
-                </div>
+                {% if user.is_authenticated %}
+                    <div>
+                        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url "logout_view" %}">Log out</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page"
+                                   href="{% url 'login' %}">{{ user.username }}</a>
+                            </li>
+
+
+                        </ul>
+                    </div>
+                    <div>
+                        <a href="{% url 'setting' %}"><img class="avatar-navbar"
+                                                           src="{% static 'img/icon.png' %}"
+                                                           alt=""></a>
+                    </div>
+                {% else %}
+                    <div>
+                        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'reg' %}">Sign up</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{% url 'login' %}">Sign in</a>
+                            </li>
+                        </ul>
+                    </div>
+                {% endif %}
                 <form class="d-flex">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success" type="submit">Search</button>
@@ -77,17 +95,23 @@
                 {% endblock content %}
             </div>
             <div class="col-3">
-                <h2 class="mt-5">Tags</h2>
+                <h2 class="mt-5">Popular tags</h2>
                 {% block tags %}
-                <div class="mt-5">
-                    {% for tag in tags %}
-                        {% include "inc/tags.html" %}
-                    {% endfor %}
-                </div>
+                    <div class="mt-5, sidebar_column">
+                        {% for tag in tags %}
+                            {% include "inc/tags.html" %}
+                        {% endfor %}
+                    </div>
                 {% endblock %}
+                <h3 class = "mt-4">Popular members</h3>
+                <div class="mt-5, sidebar_column">
+
+                </div>
             </div>
+
         </div>
     </div>
+
 </main>
 
 <script src="/docs/5.1/dist/js/bootstrap.bundle.min.js"

@@ -3,25 +3,22 @@ from django.db.models import Count
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.utils.timezone import now
+from django.contrib.auth.models import User
 
 
-class UserManager(models.Manager):
-    def get_popular(self):
-        return self.filter(likes__gt=10)
-
-    def get_user_by_answer(self, question_id):
-        return self.filter(id)
+class ProfileManager(models.Manager):
+    def get_top_users(self):
+        return self.annotate(answers=Count('answer_related')).order_by('-answers')[:5]
 
 
-class User(models.Model):
-    objects = UserManager()
-    username = models.CharField(max_length=256)
-    email = models.EmailField()
+class Profile(models.Model):
+    user = models.OneToOneField(User, null=True, related_name='profile_related', on_delete=models.CASCADE)
+    objects = ProfileManager()
     avatar = models.ImageField(upload_to='images', null=True, blank=True)
-    password = models.CharField(max_length=256)
+    bio = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return self.username
+        return self.user.username
 
 
 class TagManager(models.Manager):
@@ -44,7 +41,7 @@ class LikeManager(models.Manager):
 
 class Like(models.Model):
     objects = LikeManager()
-    user = models.ForeignKey(User, related_name='likes', on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, related_name='likes', on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
 
     object_id = models.PositiveIntegerField()
@@ -57,8 +54,6 @@ class Like(models.Model):
 class QuestionManager(models.Manager):
     def get_popular(self):
         return self.annotate(count=Count('like', distinct=True)).order_by('-count')
-
-
 
     def get_recent(self):
         return self.filter(created_date__gt=now())
@@ -78,7 +73,7 @@ class QuestionManager(models.Manager):
 
 class Question(models.Model):
     objects = QuestionManager()
-    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
     tags = models.ManyToManyField(Tag)
     create_date = models.DateTimeField(blank=True, auto_now=True)
     title = models.CharField(max_length=256)
@@ -103,7 +98,7 @@ class AnswerManager(models.Manager):
 class Answer(models.Model):
     objects = AnswerManager()
     question = models.ForeignKey(Question, on_delete=models.CASCADE, default=1)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    author = models.ForeignKey(Profile, related_name='answer_related', on_delete=models.CASCADE, default=1)
     content = models.TextField(blank=True)
     is_correct = models.BooleanField(default=False)
     like = GenericRelation(Like)
