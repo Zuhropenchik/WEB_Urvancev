@@ -32,7 +32,7 @@ class TagManager(models.Manager):
 
 class Tag(models.Model):
     objects = TagManager()
-    title = models.CharField(max_length=50, verbose_name="Tag")
+    title = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.title

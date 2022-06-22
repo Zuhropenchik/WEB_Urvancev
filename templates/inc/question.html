@@ -17,20 +17,20 @@
     <div class="col-md-6 d-flex justify-content-left" style="padding-top: 10px">
         <div>
             <button style="background-color: #fff; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(27, 31, 35, 0.15);">
-                Answers({{ question.answers_count }})
-            </button>
-        </div>
-        <div>
-            <button style="background-color: #fff; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(27, 31, 35, 0.15);">
                 I like it!
             </button>
         </div>
-        <div>
+        <div style = "padding-left:10px; padding-top:5px">
             {% if question.likes > 10 %}
                 <div style="color: #00ff00">Rating:{{ question.likes }}</div>
             {% else %}
                 <div style="color: #111111">Rating:{{ question.likes }}</div>
             {% endif %}
+        </div>
+            <div>
+            <div style = "padding-left:10px; padding-top:5px">
+                Answers({{ question.answers_count }})
+            </div>
         </div>
 
 

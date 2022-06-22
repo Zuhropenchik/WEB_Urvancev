@@ -3,10 +3,10 @@ from django.core.paginator import Paginator
 from .models import Question, Tag, Profile, Answer, Like
 from django.db.models import Count
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound, HttpResponseRedirect
-from .forms import LoginForm, SignUpForm
-from django.contrib import messages
+from .forms import LoginForm, SignUpForm, AskForm
 from django.contrib import auth
 from django.contrib.auth.models import User
 
@@ -28,7 +28,7 @@ def index(request):
     return render(request, "index.html", {"questions": content, "tags": tags, "top_users": top_users})
 
 
-def login(request):
+def login_view(request):
     if request.method == 'GET':
         user_form = LoginForm()
     elif request.method == 'POST':
@@ -46,7 +46,7 @@ def login(request):
     return render(request, "login.html", {"form": user_form, "tags": tags, "top_users": top_users})
 
 
-def signup(request):
+def signup_view(request):
     popular_tags = Tag.objects.get_popular()
     top_users = Profile.objects.get_top_users()
     if request.method == 'GET':
@@ -74,10 +74,47 @@ def logout_view(request):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-def ask(request):
+# @login_required(login_url="login")
+# def ask_view(request):
+#     tags = Tag.objects.get_popular()
+#     top_users = Profile.objects.get_top_users()
+#     if request.method == "GET":
+#         form = AskForm()
+#     elif request.method == 'POST':
+#         form = AskForm(data=request.POST)
+#         if form.is_valid():
+#             question = form.save(commit=False)
+#             question.author = Profile.objects.get(user=request.user)
+#             question.save()
+#             for tag in form.cleaned_data['tag_list'].split():
+#                 new = Tag.objects.get_or_create(title=tag)[0]
+#                 question.tags.add(new)
+#             question.save()
+#             return redirect("question", id=question.id)
+#
+#     return render(request, "ask.html",
+#                   {"form": form, "tags": tags, "top_users": top_users, "key": "authorized"})
+
+@login_required(login_url="login")
+def ask_view(request):
     tags = Tag.objects.get_popular()
     top_users = Profile.objects.get_top_users()
-    return render(request, "ask.html", {"tags": tags, "top_users": top_users})
+    if request.method == 'GET':
+        form = AskForm()
+    elif request.method == 'POST':
+        form = AskForm(data=request.POST)
+        if form.is_valid():
+            qstn = Question.objects.create(title=form.cleaned_data['title'],
+                                           text=form.cleaned_data['text'],
+                                           author=Profile.objects.get(user=request.user))
+            qstn.save()
+            if qstn:
+                return redirect(reverse("question", args=[qstn.id]))
+            else:
+                return redirect(reverse('ask'))
+
+    return render(request, "ask.html",
+                  {"form": form, "tags": tags, "top_users": top_users, "key": "authorized"})
 
 
 def reg(request):

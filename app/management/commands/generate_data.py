@@ -12,7 +12,7 @@ import random
 
 
 class Command(BaseCommand):
-    GENERATION_ORDER = 20
+    GENERATION_ORDER = 50
 
     def handle(self, *args, **options):
         self.generate_user_and_profile()
